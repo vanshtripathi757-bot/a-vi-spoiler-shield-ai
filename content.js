@@ -65,7 +65,8 @@ async function process(card,force=false){
  const verdict=local(text);
  if(verdict==="SAFE"){transition(card.dataset.gtaShieldState,"safe");card.dataset.gtaShieldState="safe";removeOverlay(card);return;}
  protect(card,verdict==="SPOILER"?"SPOILER":"UNCERTAIN",text);
- if(verdict==="UNCERTAIN"){
+ // Strict mode intentionally protects every GTA VI-related card; AI must not override it.
+ if(verdict==="UNCERTAIN" && settings.sensitivity !== "strict"){
   const ai=await classifyAI(text);
   if(!card.isConnected||textOf(card)!==text||revealed.get(card)===text)return;
   if(ai==="SAFE"){transition(card.dataset.gtaShieldState,"safe");card.dataset.gtaShieldState="safe";removeOverlay(card);}
