@@ -7,9 +7,9 @@ function parse(raw) {
 }
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function fetchWithRetry(url, options, maxAttempts = 4) {
+async function fetchWithRetry(url, options, maxAttempts = 3) {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    const response = await fetch(url, options);
+    const response = await fetch(url, { ...options, signal: AbortSignal.timeout(10000) });
     if (response.ok || response.status !== 503 || attempt === maxAttempts) {
       return response;
     }
@@ -44,7 +44,6 @@ async function classify(text) {
         type: "OBJECT", properties: { verdict: { type: "STRING", enum: ["SAFE", "SPOILER", "UNCERTAIN"] }, confidence: { type: "NUMBER" }, category: { type: "STRING" } }, required: ["verdict", "confidence", "category"]
       } }
     }),
-    signal: AbortSignal.timeout(15000)
   });
   if (!response.ok) {
     const detail = (await response.text()).slice(0, 300);
