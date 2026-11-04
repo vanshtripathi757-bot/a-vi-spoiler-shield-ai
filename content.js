@@ -2,22 +2,26 @@
 "use strict";
 if (window.__gtaShieldInstalled) return;
 window.__gtaShieldInstalled = true;
-const CARD = ["ytd-rich-item-renderer","ytd-video-renderer","ytd-compact-video-renderer","ytd-grid-video-renderer","ytd-reel-item-renderer","yt-lockup-view-model","ytm-shorts-lockup-view-model"].join(",");
+const IS_INSTAGRAM = location.hostname === "www.instagram.com" || location.hostname === "instagram.com";
+const CARD = IS_INSTAGRAM ? "article,[role=\"article\"]" : ["ytd-rich-item-renderer","ytd-video-renderer","ytd-compact-video-renderer","ytd-grid-video-renderer","ytd-reel-item-renderer","yt-lockup-view-model","ytm-shorts-lockup-view-model"].join(",");
 const GAME = /\b(?:gta\s*(?:6|vi|six)|grand\s*theft\s*auto\s*(?:6|vi|six))\b/i;
 const CHAR = /\b(?:lucia|jason)\b/i;
+// Temporary high-sensitivity keyword shield: any listed reference is blocked without AI approval.
+const DIRECT_REFERENCE = /\b(?:gta\s*(?:6|vi|six)|gta6|grand\s*theft\s*auto(?:\s*(?:6|vi|six))?|vice\s*city|luc[ií]a|jason\s*duval|leonida|rockstar\s*games?|project\s*americas?)\b/i;
 const STRONG = /\b(?:ending\s*(?:leak\w*|explained)|leaked\s*ending|story\s*leak\w*|final\s*mission|secret\s*ending|plot\s*twist\w*|character\s*death\w*|character\s*dies|gets\s*killed|is\s*killed|leaked\s*cutscene\w*|leaked\s*gameplay|gameplay\s*leak\w*|mission\s*details|full\s*story|spoiler\s*alert|spoilers?|leaks?)\b/i;
 const AMBIG = /\b(?:ending\w*|finale|mission\w*|cutscene\w*|story\s*revealed|reveal\w*|betrayal|death\w*|dies|killed|plot|walkthrough|playthrough|breakdown|gameplay\s*details)\b/i;
 let settings={enabled:true,aiEnabled:true,sensitivity:"balanced",backendUrl:""};
 let scanned=0,protectedCount=0,frame=0;
 const fingerprints=new WeakMap(),revealed=new WeakMap(),pending=new Set();
 function textOf(card){
- const a=[card.innerText,card.getAttribute("aria-label"),card.getAttribute("title")];
+ const a=[card.innerText,card.getAttribute("aria-label"),card.getAttribute("title"),card.getAttribute("data-testid")];
  card.querySelectorAll("[title],[aria-label],img[alt],a#video-title").forEach(el=>{
   ["title","aria-label","alt"].forEach(k=>{const v=el.getAttribute(k);if(v)a.push(v);});
  });
  return a.filter(Boolean).join(" ").replace(/\s+/g," ").trim().slice(0,2500);
 }
 function local(text){
+ if(DIRECT_REFERENCE.test(text))return "SPOILER";
  const context=GAME.test(text)||(CHAR.test(text)&&/\b(?:vice\s*city|leonida|rockstar|gta)\b/i.test(text));
  if(!context)return "SAFE";
  if(STRONG.test(text))return "SPOILER";
