@@ -7,7 +7,7 @@ function parse(raw) {
 }
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-async function fetchWithRetry(url, options, maxAttempts = 3) {
+async function fetchWithRetry(url, options, maxAttempts = 4) {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const response = await fetch(url, options);
     if (response.ok || response.status !== 503 || attempt === maxAttempts) {
@@ -17,7 +17,7 @@ async function fetchWithRetry(url, options, maxAttempts = 3) {
     const retryAfter = Number(response.headers.get("retry-after"));
     const delay = Number.isFinite(retryAfter) && retryAfter > 0
       ? Math.min(retryAfter * 1000, 5000)
-      : 800 * (2 ** (attempt - 1));
+      : 1000 * (2 ** (attempt - 1));
 
     console.warn("Gemini temporarily unavailable; retrying", {
       status: response.status,
