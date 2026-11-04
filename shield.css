@@ -1,0 +1,28 @@
+ytd-rich-item-renderer:not([data-gta-shield-state]),
+ytd-video-renderer:not([data-gta-shield-state]),
+ytd-compact-video-renderer:not([data-gta-shield-state]),
+ytd-grid-video-renderer:not([data-gta-shield-state]),
+ytd-reel-item-renderer:not([data-gta-shield-state]),
+yt-lockup-view-model:not([data-gta-shield-state]),
+ytm-shorts-lockup-view-model:not([data-gta-shield-state]) { visibility:hidden!important; }
+[data-gta-shield-state="spoiler"] > *,
+[data-gta-shield-state="uncertain"] > * {
+  filter:blur(13px)!important; pointer-events:none!important; user-select:none!important;
+}
+[data-gta-shield-state="safe"],[data-gta-shield-state="off"] { visibility:visible!important; }
+[data-gta-shield-state="spoiler"],[data-gta-shield-state="uncertain"] {
+  visibility:visible!important; position:relative;
+}
+.gta-shield-overlay {
+  position:absolute; inset:0; z-index:9999; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:12px; padding:16px;
+  color:#fff; text-align:center; background:rgba(12,12,18,.95);
+  border:1px solid rgba(164,94,255,.55); border-radius:12px;
+  box-sizing:border-box; filter:none!important; pointer-events:auto!important;
+}
+.gta-shield-overlay span {font:600 13px/1.4 system-ui,sans-serif}
+.gta-shield-overlay button {
+  border:0; border-radius:999px; padding:9px 16px; color:#fff;
+  background:linear-gradient(110deg,#b32645,#7138b8);
+  font:600 12px system-ui,sans-serif; cursor:pointer;
+}
