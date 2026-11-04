@@ -7,15 +7,17 @@ const CARD = IS_INSTAGRAM ? "article,[role=\"article\"]" : ["ytd-rich-item-rende
 const GAME = /\b(?:gta\s*(?:6|vi|six)|grand\s*theft\s*auto\s*(?:6|vi|six))\b/i;
 const CHAR = /\b(?:lucia|jason)\b/i;
 // Temporary high-sensitivity keyword shield: any listed reference is blocked without AI approval.
-const DIRECT_REFERENCE = /\b(?:gta\s*(?:6|vi|six)|gta6|grand\s*theft\s*auto(?:\s*(?:6|vi|six))?|vice\s*city|luc[ií]a|jason\s*duval|leonida|rockstar\s*games?|project\s*americas?)\b/i;
+const DIRECT_REFERENCE = /\b(?:gta\s*(?:6|vi|six)|gta6|grand\s*theft\s*auto(?:\s*(?:6|vi|six))?|vice\s*city|luc[ií]a|jason(?:\s*duval)?|leonida|rockstar(?:\s*games?)?|project\s*americas?|port\s*gellhorn|ambrosia|grassrivers|whetstone|mount\s*kalaga)\b/i;
 const STRONG = /\b(?:ending\s*(?:leak\w*|explained)|leaked\s*ending|story\s*leak\w*|final\s*mission|secret\s*ending|plot\s*twist\w*|character\s*death\w*|character\s*dies|gets\s*killed|is\s*killed|leaked\s*cutscene\w*|leaked\s*gameplay|gameplay\s*leak\w*|mission\s*details|full\s*story|spoiler\s*alert|spoilers?|leaks?)\b/i;
 const AMBIG = /\b(?:ending\w*|finale|mission\w*|cutscene\w*|story\s*revealed|reveal\w*|betrayal|death\w*|dies|killed|plot|walkthrough|playthrough|breakdown|gameplay\s*details)\b/i;
 let settings={enabled:true,aiEnabled:true,sensitivity:"balanced",backendUrl:""};
 let scanned=0,protectedCount=0,frame=0;
 const fingerprints=new WeakMap(),revealed=new WeakMap(),pending=new Set();
 function textOf(card){
- const a=[card.innerText,card.getAttribute("aria-label"),card.getAttribute("title"),card.getAttribute("data-testid")];
- card.querySelectorAll("[title],[aria-label],img[alt],a#video-title").forEach(el=>{
+ const clean=card.cloneNode(true);
+ clean.querySelectorAll(".gta-shield-overlay").forEach(el=>el.remove());
+ const a=[clean.innerText||clean.textContent,card.getAttribute("aria-label"),card.getAttribute("title"),card.getAttribute("data-testid")];
+ clean.querySelectorAll("[title],[aria-label],img[alt],a#video-title").forEach(el=>{
   ["title","aria-label","alt"].forEach(k=>{const v=el.getAttribute(k);if(v)a.push(v);});
  });
  return a.filter(Boolean).join(" ").replace(/\s+/g," ").trim().slice(0,2500);
@@ -61,7 +63,8 @@ async function classifyAI(text){
 async function process(card,force=false){
  if(!(card instanceof HTMLElement)||!card.isConnected)return;
  if(!settings.enabled){transition(card.dataset.gtaShieldState,"off");card.dataset.gtaShieldState="off";removeOverlay(card);return;}
- const text=textOf(card);if(!text)return;
+ const text=textOf(card);
+ if(!text){transition(card.dataset.gtaShieldState,"safe");card.dataset.gtaShieldState="safe";removeOverlay(card);return;}
  if(!force&&fingerprints.get(card)===text&&card.dataset.gtaShieldState)return;
  if(!force&&revealed.get(card)===text)return;
  fingerprints.set(card,text);
@@ -98,6 +101,7 @@ const observer=new MutationObserver(ms=>ms.forEach(m=>{
 }));
 function start(){
  if(!document.documentElement)return;
+ if(IS_INSTAGRAM)document.documentElement.classList.add("gta-shield-instagram");
  observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["title","aria-label","alt"]});
  scan();
 }
