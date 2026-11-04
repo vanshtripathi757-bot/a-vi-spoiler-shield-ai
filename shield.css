@@ -26,3 +26,6 @@ ytm-shorts-lockup-view-model:not([data-gta-shield-state]) { visibility:hidden!im
   background:linear-gradient(110deg,#b32645,#7138b8);
   font:600 12px system-ui,sans-serif; cursor:pointer;
 }
+/* Instagram feed/reel cards: conceal until their text is inspected. */
+html body article:not([data-gta-shield-state]),
+html body [role="article"]:not([data-gta-shield-state]) { visibility:hidden!important; }
