@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "GTA VI Spoiler Shield AI",
+  "version": "0.3.0",
+  "description": "Local and AI-powered GTA VI spoiler protection for YouTube.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://www.youtube.com/*", "https://*.vercel.app/*"],
+  "background": {"service_worker":"service-worker.js"},
+  "action": {"default_title":"GTA VI Spoiler Shield AI","default_popup":"popup.html"},
+  "content_scripts": [{
+    "matches":["https://www.youtube.com/*"],
+    "js":["content.js"],
+    "css":["shield.css"],
+    "run_at":"document_start"
+  }]
+}
