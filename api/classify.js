@@ -28,6 +28,11 @@ async function gemini(text){
 }
 module.exports=async(req,res)=>{
  res.setHeader("Cache-Control","no-store");
+ // Allow browser-based API testers and the Chrome extension to call this endpoint.
+ res.setHeader("Access-Control-Allow-Origin","*");
+ res.setHeader("Access-Control-Allow-Methods","POST, OPTIONS");
+ res.setHeader("Access-Control-Allow-Headers","Content-Type");
+ if(req.method==="OPTIONS")return res.status(204).end();
  if(req.method!=="POST")return res.status(405).json({error:"Method not allowed"});
  const text=typeof req.body?.text==="string"?req.body.text.trim().slice(0,2500):"";
  if(!text)return res.status(400).json({error:"text is required"});
